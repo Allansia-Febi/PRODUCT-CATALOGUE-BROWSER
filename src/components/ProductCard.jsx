@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Star } from 'lucide-react';
+import { Star, ArrowRight } from 'lucide-react';
 
 export const ProductCard = React.memo(function ProductCard({ product, onSaveScroll }) {
   const navigate = useNavigate();
@@ -39,7 +39,7 @@ export const ProductCard = React.memo(function ProductCard({ product, onSaveScro
         />
         {product.discountPercentage > 5 && (
           <span className="discount-badge">
-            -{Math.round(product.discountPercentage)}%
+            -{Math.round(product.discountPercentage)}% OFF
           </span>
         )}
       </div>
@@ -50,11 +50,12 @@ export const ProductCard = React.memo(function ProductCard({ product, onSaveScro
 
         <div className="card-meta">
           <div className="rating-star">
-            <Star size={14} fill="#f59e0b" color="#f59e0b" />
+            <Star size={13} fill="#fbbf24" color="#fbbf24" />
             <span>{product.rating?.toFixed(1) || '4.0'}</span>
           </div>
 
           <span className={`stock-status ${isInStock ? 'stock-in' : 'stock-out'}`}>
+            {isInStock && <span className="pulse-dot" />}
             {isInStock ? `${product.stock} in stock` : 'Out of stock'}
           </span>
         </div>
@@ -66,6 +67,11 @@ export const ProductCard = React.memo(function ProductCard({ product, onSaveScro
               <span className="original-price">${originalPrice}</span>
             )}
           </div>
+
+          <span className="card-action-link">
+            Details
+            <ArrowRight size={14} />
+          </span>
         </div>
       </div>
     </article>

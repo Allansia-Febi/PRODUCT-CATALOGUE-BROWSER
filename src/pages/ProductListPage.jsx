@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { Sparkles, ShieldCheck, Zap, Star } from 'lucide-react';
 import { Header } from '../components/Header';
 import { Filters } from '../components/Filters';
 import { FilterChips } from '../components/FilterChips';
@@ -50,8 +51,6 @@ export function ProductListPage() {
 
     fetchAllProducts(controller.signal)
       .then((data) => {
-        // Race condition / stale request check:
-        // Ensure older pending requests cannot overwrite newer ones
         if (data.sequenceId >= latestSequenceIdRef.current) {
           latestSequenceIdRef.current = data.sequenceId;
           setAllProducts(data.products || []);
@@ -80,7 +79,6 @@ export function ProductListPage() {
     if (!allProducts || allProducts.length === 0) return [];
 
     return allProducts.filter((product) => {
-      // 1. Search filter (title, description, brand, category, tags)
       if (search) {
         const query = search.toLowerCase().trim();
         const matchesTitle = product.title?.toLowerCase().includes(query);
@@ -94,29 +92,24 @@ export function ProductListPage() {
         }
       }
 
-      // 2. Category filter
       if (category && product.category !== category) {
         return false;
       }
 
-      // 3. Min Price filter
       if (minPrice !== '' && !isNaN(Number(minPrice))) {
         if (product.price < Number(minPrice)) return false;
       }
 
-      // 4. Max Price filter
       if (maxPrice !== '' && !isNaN(Number(maxPrice))) {
         if (product.price > Number(maxPrice)) return false;
       }
 
-      // 5. Stock filter
       if (inStock && product.stock <= 0) {
         return false;
       }
 
       return true;
     }).sort((a, b) => {
-      // 6. Sorting
       if (sort === 'price-asc') return a.price - b.price;
       if (sort === 'price-desc') return b.price - a.price;
       if (sort === 'rating-asc') return a.rating - b.rating;
@@ -125,7 +118,6 @@ export function ProductListPage() {
     });
   }, [allProducts, search, category, minPrice, maxPrice, inStock, sort]);
 
-  // Pagination calculation
   const totalPages = Math.ceil(filteredProducts.length / PAGE_SIZE) || 1;
   const currentPage = Math.min(Math.max(1, page), totalPages);
 
@@ -146,12 +138,43 @@ export function ProductListPage() {
       <Header searchValue={search} onSearchChange={handleSearchChange} />
 
       <main className="app-container">
+        {/* Catalogue Hero Section */}
+        <section className="catalogue-hero">
+          <div className="hero-badge">
+            <Sparkles size={14} />
+            <span>2026 Collection • 100% Authentic Items</span>
+          </div>
+          <h1 className="hero-title">
+            Discover <span className="brand-title-accent">World-Class</span> Products
+          </h1>
+          <p className="hero-subtitle">
+            Browse our curated catalog with real-time debounced search, combined multi-filters, and instant URL synchronization.
+          </p>
+
+          <div className="hero-stats">
+            <div className="hero-stat-item">
+              <Zap size={14} color="#818cf8" />
+              <span>Real-Time Filtering</span>
+            </div>
+            <div className="hero-stat-item">
+              <ShieldCheck size={14} color="#34d399" />
+              <span>Verified API Data</span>
+            </div>
+            <div className="hero-stat-item">
+              <Star size={14} color="#fbbf24" />
+              <span>4.8 Avg Rating</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Filter Toolbar */}
         <Filters
           categories={categories}
           filters={queryState}
           onFilterChange={updateFilters}
         />
 
+        {/* Active Filter Chips */}
         <FilterChips
           filters={queryState}
           categories={categories}
@@ -159,7 +182,7 @@ export function ProductListPage() {
           onClearAll={clearAllFilters}
         />
 
-        {/* Content Views */}
+        {/* Dynamic View States */}
         {isLoading ? (
           <ProductSkeleton count={PAGE_SIZE} />
         ) : error ? (
@@ -168,8 +191,8 @@ export function ProductListPage() {
           <EmptyState search={search} onClearFilters={clearAllFilters} />
         ) : (
           <>
-            <div style={{ marginBottom: '1rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-              Showing {paginatedProducts.length} of {filteredProducts.length} products
+            <div style={{ marginBottom: '1.25rem', fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+              Showing <strong style={{ color: 'var(--text-primary)' }}>{paginatedProducts.length}</strong> of <strong style={{ color: 'var(--text-primary)' }}>{filteredProducts.length}</strong> matching products
             </div>
             <ProductGrid products={paginatedProducts} onSaveScroll={saveScrollPosition} />
             <Pagination

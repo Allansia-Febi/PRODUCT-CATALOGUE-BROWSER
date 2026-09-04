@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react';
-import { ArrowLeft, Star, ShieldCheck, Truck, RefreshCw, Tag, Box } from 'lucide-react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft, Star, ShieldCheck, Truck, Tag, MessageSquare, ChevronRight } from 'lucide-react';
 import { fetchProductById } from '../services/productsApi';
 import { ImageGallery } from '../components/ImageGallery';
 import { ErrorState } from '../components/ErrorState';
@@ -54,14 +54,14 @@ export function ProductDetailPage() {
   if (isLoading) {
     return (
       <div className="app-container" style={{ padding: '2rem 1.5rem' }}>
-        <div className="skeleton" style={{ width: '120px', height: '30px', marginBottom: '2rem' }} />
+        <div className="skeleton" style={{ width: '140px', height: '30px', marginBottom: '2rem' }} />
         <div className="detail-grid">
-          <div className="skeleton" style={{ height: '400px', borderRadius: '12px' }} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div className="skeleton" style={{ width: '40%', height: '20px' }} />
-            <div className="skeleton" style={{ width: '80%', height: '36px' }} />
-            <div className="skeleton" style={{ width: '30%', height: '40px' }} />
-            <div className="skeleton" style={{ width: '100%', height: '100px' }} />
+          <div className="skeleton" style={{ height: '420px', borderRadius: '16px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+            <div className="skeleton" style={{ width: '40%', height: '24px' }} />
+            <div className="skeleton" style={{ width: '80%', height: '40px' }} />
+            <div className="skeleton" style={{ width: '30%', height: '44px' }} />
+            <div className="skeleton" style={{ width: '100%', height: '120px' }} />
           </div>
         </div>
       </div>
@@ -85,7 +85,18 @@ export function ProductDetailPage() {
     : null;
 
   return (
-    <div className="app-container">
+    <div className="app-container" style={{ paddingTop: '1.5rem' }}>
+      {/* Breadcrumb Navigation */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
+        <Link to="/products" style={{ color: 'inherit', textDecoration: 'none' }}>Catalogue</Link>
+        <ChevronRight size={14} />
+        <span style={{ textTransform: 'capitalize' }}>{product.category}</span>
+        <ChevronRight size={14} />
+        <span style={{ color: 'var(--text-primary)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '300px' }}>
+          {product.title}
+        </span>
+      </div>
+
       <button
         type="button"
         className="back-btn"
@@ -93,7 +104,7 @@ export function ProductDetailPage() {
         aria-label="Back to product catalogue (or press Escape)"
       >
         <ArrowLeft size={18} />
-        Back to Catalogue (Press Esc)
+        Back to Catalogue <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>(Esc)</span>
       </button>
 
       <div className="detail-grid" role="main" aria-label={`Details for ${product.title}`}>
@@ -105,13 +116,14 @@ export function ProductDetailPage() {
           <span className="card-category">{product.category}</span>
           <h1 className="detail-title">{product.title}</h1>
 
-          <div className="card-meta">
+          <div className="card-meta" style={{ justifyContent: 'flex-start', gap: '1rem' }}>
             <div className="rating-star">
-              <Star size={16} fill="#f59e0b" color="#f59e0b" />
+              <Star size={15} fill="#fbbf24" color="#fbbf24" />
               <span>{product.rating?.toFixed(1)}</span>
             </div>
 
             <span className={`stock-status ${product.stock > 0 ? 'stock-in' : 'stock-out'}`}>
+              {product.stock > 0 && <span className="pulse-dot" />}
               {product.stock > 0 ? `${product.stock} items in stock (${product.availabilityStatus || 'Available'})` : 'Out of stock'}
             </span>
           </div>
@@ -130,11 +142,11 @@ export function ProductDetailPage() {
             )}
           </div>
 
-          <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, margin: '1rem 0' }}>
+          <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, fontSize: '1rem' }}>
             {product.description}
           </p>
 
-          {/* Product Specifications Grid */}
+          {/* Specs List */}
           <div className="detail-meta-list">
             {product.brand && (
               <div>
@@ -151,8 +163,8 @@ export function ProductDetailPage() {
             {product.warrantyInformation && (
               <div>
                 <span className="meta-item-label">Warranty</span>
-                <div className="meta-item-value" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <ShieldCheck size={14} color="var(--border-focus)" />
+                <div className="meta-item-value" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <ShieldCheck size={15} color="#818cf8" />
                   {product.warrantyInformation}
                 </div>
               </div>
@@ -160,8 +172,8 @@ export function ProductDetailPage() {
             {product.shippingInformation && (
               <div>
                 <span className="meta-item-label">Shipping</span>
-                <div className="meta-item-value" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <Truck size={14} color="var(--badge-success-text)" />
+                <div className="meta-item-value" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Truck size={15} color="#34d399" />
                   {product.shippingInformation}
                 </div>
               </div>
@@ -182,19 +194,20 @@ export function ProductDetailPage() {
 
           {/* Tags */}
           {Array.isArray(product.tags) && product.tags.length > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
-              <Tag size={16} color="var(--text-muted)" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+              <Tag size={15} color="var(--text-muted)" />
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                 {product.tags.map((tag) => (
                   <span
                     key={tag}
                     style={{
-                      backgroundColor: 'var(--bg-main)',
-                      border: '1px solid var(--border-color)',
-                      padding: '0.2rem 0.6rem',
+                      backgroundColor: 'rgba(255,255,255,0.05)',
+                      border: '1px solid var(--border-subtle)',
+                      padding: '0.25rem 0.65rem',
                       borderRadius: 'var(--radius-full)',
                       fontSize: '0.8rem',
-                      color: 'var(--text-secondary)'
+                      color: 'var(--text-secondary)',
+                      fontWeight: 500
                     }}
                   >
                     #{tag}
@@ -202,6 +215,28 @@ export function ProductDetailPage() {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Verified Reviews Section */}
+          {Array.isArray(product.reviews) && product.reviews.length > 0 && (
+            <section className="reviews-section">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <MessageSquare size={18} color="#818cf8" />
+                <h3 className="reviews-title" style={{ margin: 0 }}>Customer Reviews ({product.reviews.length})</h3>
+              </div>
+              {product.reviews.map((rev, idx) => (
+                <div key={idx} className="review-card">
+                  <div className="review-header">
+                    <span className="reviewer-name">{rev.reviewerName}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', color: '#fbbf24' }}>
+                      <Star size={13} fill="#fbbf24" color="#fbbf24" />
+                      <span>{rev.rating}</span>
+                    </div>
+                  </div>
+                  <p className="review-comment">"{rev.comment}"</p>
+                </div>
+              ))}
+            </section>
           )}
         </div>
       </div>
