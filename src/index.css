@@ -382,6 +382,7 @@ html, body {
   display: flex;
   flex-direction: column;
   flex: 1;
+}
 
 .card-category {
   font-size: 0.75rem;
