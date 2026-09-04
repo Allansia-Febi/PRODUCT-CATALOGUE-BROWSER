@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { Sparkles, ShieldCheck, Zap, Star } from 'lucide-react';
 import { Header } from '../components/Header';
 import { Filters } from '../components/Filters';
+import { CategoryPills } from '../components/CategoryPills';
 import { FilterChips } from '../components/FilterChips';
 import { ProductGrid } from '../components/ProductGrid';
 import { ProductSkeleton } from '../components/ProductSkeleton';
@@ -133,9 +134,20 @@ export function ProductListPage() {
     [updateFilters]
   );
 
+  const handleCategorySelect = useCallback(
+    (newCategory) => {
+      updateFilters({ category: newCategory });
+    },
+    [updateFilters]
+  );
+
   return (
     <div>
-      <Header searchValue={search} onSearchChange={handleSearchChange} />
+      <Header
+        searchValue={search}
+        onSearchChange={handleSearchChange}
+        totalCount={allProducts.length || 194}
+      />
 
       <main className="app-container">
         {/* Catalogue Hero Section */}
@@ -166,6 +178,13 @@ export function ProductListPage() {
             </div>
           </div>
         </section>
+
+        {/* Quick Category Icon Pills */}
+        <CategoryPills
+          categories={categories}
+          activeCategory={category}
+          onSelectCategory={handleCategorySelect}
+        />
 
         {/* Filter Toolbar */}
         <Filters
